@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dummy Webpage</title>
+<style>
+ /* Styles for the icon */
+ .msg-icon {
+   position: fixed;
+   bottom: 20px;
+   right: 20px;
+   width: 50px;
+   height: 50px;
+   background-color: #007bff;
+   color: white;
+   border-radius: 50%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   cursor: pointer;
+ }
+ /* Styles for the popup form */
+ .popup-form {
+   display: none;
+   position: fixed;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   background-color: #f9f9f9;
+   padding: 20px;
+   border: 1px solid #ccc;
+   border-radius: 5px;
+   z-index: 999;
+ }
+</style>
+</head>
+<body>
+<!-- Icon to trigger the popup form -->
+<div class="msg-icon" id="msgIcon">
+<span>&#9993;</span>
+</div>
+<!-- Popup form -->
+<div class="popup-form" id="popupForm">
+<h2>Submit Form</h2>
+<form id="salesforceForm">
+<label for="firstName">First Name:</label><br>
+<input type="text" id="firstName" name="firstName"><br>
+<label for="lastName">Last Name:</label><br>
+<input type="text" id="lastName" name="lastName"><br>
+<label for="email">Email:</label><br>
+<input type="email" id="email" name="email"><br><br>
+<button type="submit">Submit</button>
+</form>
+</div>
+<script>
+ // Function to toggle the visibility of the popup form
+ function togglePopup() {
+   var popup = document.getElementById("popupForm");
+   popup.style.display = (popup.style.display === "block") ? "none" : "block";
+ }
+ // Function to handle form submission
+ function submitForm(event) {
+   event.preventDefault();
+   var formData = new FormData(event.target);
+	 var firstName = formData.get('firstName');
+	 var lastName = formData.get('lastName');
+	 var email = formData.get('email');
+	 // Call the function to create account in Salesforce
+	 createAccount(firstName, lastName, email);
+   };
+ 
+ function createAccount(firstName, lastName, email) {
+ var xhr = new XMLHttpRequest();
+ var url = 'https://geisingerhealthsys--hcrmdev.sandbox.lightning.force.com/lightning/o/GSHT_Marketing_Interaction__c';
+ var accessToken = '3tpmJSpy3tXOj77w6e1RWlzyv'; // Replace with your Salesforce access token
+ var miData = {
+   GSHT_First_Name__c: firstName,
+   GSHT_Last_Name__c: lastName,
+   GSHT_Email__c: email // Assuming 'Email__c' is the custom field for email in Salesforce
+ };
+ xhr.open('POST', url, true);
+ xhr.setRequestHeader('Content-Type', 'application/json');
+ xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+ xhr.onreadystatechange = function () {
+   if (xhr.readyState === 4) {
+     if (xhr.status === 201) {
+       console.log('MI created successfully:', JSON.parse(xhr.responseText));
+       alert('MI created successfully!');
+     } else {
+       console.error('Error creating MI:', JSON.parse(xhr.responseText));
+       alert('Error creating MI. Please try again later.');
+     }
+   }
+ };
+ xhr.send(JSON.stringify(miData));
+}
+ // Add event listeners
+ document.getElementById("msgIcon").addEventListener("click", togglePopup);
+ document.getElementById("salesforceForm").addEventListener("submit", submitForm);
+</script>
+</body>
+</html>
